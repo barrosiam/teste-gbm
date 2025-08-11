@@ -9,48 +9,29 @@ import {
   type OpStatus, type OpType, type OpTerminal
 } from "../inputs/select/selectOptions";
 
-
-// type EditProps = {
-//   mode: 'edit',
-//   open: boolean;
-//   onOpenChange: (v: boolean) => void;
-//   operation: Operation; // edição sempre vem com operação completa
-//   onSubmit: (updated: Operation) => void | Promise<void>;
-//   saving?: boolean;
-// };
-
-// type CreateProps = {
-//   mode: 'create',
-//   open: boolean;
-//   onOpenChange: (v: boolean) => void;
-//   // valores padrão opcionais para pré-preencher na criação
-//   initial?: Partial<Pick<Operation, "description" | "type" | "terminal" | "status">>;
-//   onSubmit: (values: Omit<Operation, "id">) => void | Promise<void>;
-//   saving?: boolean;
-// };
-
-type BaseProps= {
+type EditProps = {
+  mode: 'edit',
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  operation: Operation; // edição sempre vem com operação completa
+  onSubmit: (updated: Operation) => void | Promise<void>;
   saving?: boolean;
 };
 
-type CreateProps = BaseProps & {
-  mode: "create"
+type CreateProps = {
+  mode: 'create',
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  // valores padrão opcionais para pré-preencher na criação
+  initial?: Partial<Pick<Operation, "description" | "type" | "terminal" | "status">>;
   onSubmit: (values: Omit<Operation, "id">) => void | Promise<void>;
-  initial?: Partial<Pick<Operation, "description" | "type" | "terminal" | "status">>; // opcional no create
-};
-
-type EditProps = BaseProps & {
-  mode: "edit"
-  operation: Operation; // vem com id
-  onSubmit: (updated: Operation) => void | Promise<void>;
+  saving?: boolean;
 };
 
 
 type Props = CreateProps | EditProps
 
-export function OperationModal(props: Props) {
+export function OperationModal(props: Props ) {
   const { open, onOpenChange, saving = false } = props;
 
   const [description, setDescription] = useState("");
@@ -77,6 +58,7 @@ export function OperationModal(props: Props) {
 
   const title = props.mode === 'edit' ? "Editar operação" : "Nova operação";
   const submitLabel = props.mode === 'edit' ? "Salvar" : "Criar";
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,17 +111,9 @@ export function OperationModal(props: Props) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Flex direction="column" className="gap-2">
-              <Flex direction="column">
-                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Descrição:</Text>
-                <TextArea
-                  size="3"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={saving}
-                />
-              </Flex>
+      
 
-              <Flex align="center" className="gap-2">
+              <Flex direction="column" className="gap-1">
                 <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Terminal:</Text>
                 <ModalSelect
                   value={terminal}
@@ -149,7 +123,7 @@ export function OperationModal(props: Props) {
                   disabled={saving}
                 />
               </Flex>
-              <Flex align="center" className="gap-2">
+              <Flex direction="column" className="gap-1">
                 <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Tipo:</Text>
                 <ModalSelect
                   value={type}
@@ -159,14 +133,26 @@ export function OperationModal(props: Props) {
                   disabled={saving}
                 />
               </Flex>
-
-              <Flex align="center" className="gap-2" >
-                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Status:</Text>
-                <ModalSelect
-                  value={status}
-                  onChange={setStatus}
-                  options={STATUS_OPTIONS}
-                  placeholder="Selecione um status"
+              {props.mode === "edit" && (
+                <Flex direction="column" className="gap-1" >
+                  <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Status:</Text>
+                  <ModalSelect
+                    value={status}
+                    onChange={setStatus}
+                    options={STATUS_OPTIONS}
+                    placeholder="Selecione um status"
+                    disabled={saving}
+                  />
+                </Flex>
+              )}
+              <Flex direction="column" className="gap-1">
+                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Descrição:</Text>
+                <TextArea
+                  size="3"
+                  value={description}
+                  placeholder="Informe uma descrição"
+                  radius="large"
+                  onChange={(e) => setDescription(e.target.value)}
                   disabled={saving}
                 />
               </Flex>
