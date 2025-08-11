@@ -1,4 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
+import * as TextField from "@radix-ui/themes/components/text-field";
 import { TextArea, Text, Flex, Button } from "@radix-ui/themes";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
@@ -31,24 +32,30 @@ type CreateProps = {
 
 type Props = CreateProps | EditProps
 
-export function OperationModal(props: Props ) {
+export function OperationModal(props: Props) {
   const { open, onOpenChange, saving = false } = props;
 
   const [description, setDescription] = useState("");
   const [terminal, setTerminal] = useState<OpTerminal | "">("");
   const [type, setType] = useState<OpType | "">("");
   const [status, setStatus] = useState<OpStatus | "">("");
+  const [name, setName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const nameId = "op-name";
+  const nameErrId = "op-name-error";
 
   useEffect(() => {
     if (!open) return;
 
     if (props.mode === "edit") {
       const op = props.operation;
+      setName(op.name ?? "");
       setDescription(op.description ?? "");
       setType(op.type ?? "");
       setTerminal(op.terminal ?? "");
       setStatus(op.status ?? "");
     } else {
+      setName(props.initial?.name ?? "")
       setDescription(props.initial?.description ?? "");
       setType(props.initial?.type ?? "");
       setTerminal(props.initial?.terminal ?? "");
@@ -63,10 +70,15 @@ export function OperationModal(props: Props ) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // add lib de gerenciamento de formulario
-    if (!type || !terminal || !status || !description) return;
+    if (!name.trim()) {
+      setNameError("Nome é obrigatório.");
+      return;
+    }
+ 
+    if (!type || !terminal || (props.mode === "edit" && !status) || !description) return;
 
     const submitData = {
+      name: name.trim(),
       description,
       type,
       terminal,
@@ -111,10 +123,33 @@ export function OperationModal(props: Props ) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Flex direction="column" className="gap-2">
-      
+              <Flex direction="column" className="gap-1">
+                <Text as="label" htmlFor={nameId} className="font-medium text-black/90">
+                  Nome:
+                </Text>
+
+                <TextField.Root id={nameId}
+                  type="text"
+                  autoComplete="name"
+                  className="rt-TextFieldInput w-full bg-transparent outline-none"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Digite o nome"
+                  aria-invalid={!!nameError}
+                  aria-describedby={nameError ? nameErrId : undefined}
+                  disabled={saving} size="3">
+
+                </TextField.Root>
+
+                {nameError && (
+                  <Text id={nameErrId} color="red" size="2">
+                    {nameError}
+                  </Text>
+                )}
+              </Flex>
 
               <Flex direction="column" className="gap-1">
-                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Terminal:</Text>
+                <Text as="label" className="font-medium text-black/90">Terminal:</Text>
                 <ModalSelect
                   value={terminal}
                   onChange={setTerminal}
@@ -124,7 +159,7 @@ export function OperationModal(props: Props ) {
                 />
               </Flex>
               <Flex direction="column" className="gap-1">
-                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Tipo:</Text>
+                <Text as="label" className="font-medium text-black/90">Tipo:</Text>
                 <ModalSelect
                   value={type}
                   onChange={setType}
@@ -135,7 +170,7 @@ export function OperationModal(props: Props ) {
               </Flex>
               {props.mode === "edit" && (
                 <Flex direction="column" className="gap-1" >
-                  <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Status:</Text>
+                  <Text as="label" className="font-medium text-black/90">Status:</Text>
                   <ModalSelect
                     value={status}
                     onChange={setStatus}
@@ -146,7 +181,7 @@ export function OperationModal(props: Props ) {
                 </Flex>
               )}
               <Flex direction="column" className="gap-1">
-                <Text as="label" className="font-medium text-rgba(0, 0, 0, 0.9)">Descrição:</Text>
+                <Text as="label" className="font-medium text-black/90">Descrição:</Text>
                 <TextArea
                   size="3"
                   value={description}
