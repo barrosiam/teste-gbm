@@ -1,34 +1,18 @@
 import React from 'react'
 import {
-  Table,
-  Button,
-  ScrollArea,
-  Box,
-  Flex,
-  TextField,
+  Table, Button, ScrollArea, Box, Flex, TextField,
 } from '@radix-ui/themes'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import {
   useReactTable,
-  type ColumnDef,
-  type CellContext,
-  type Row,
-  type FilterFn,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  type SortingState,
-  flexRender,
+  type ColumnDef, type CellContext, type Row, type FilterFn,
+  getCoreRowModel, getSortedRowModel, getFilteredRowModel,
+  type SortingState, flexRender,
 } from '@tanstack/react-table'
 import {
-  ChevronUpIcon,
-  ChevronDownIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  EllipsisHorizontalIcon,
+  ChevronUpIcon, ChevronDownIcon, PencilSquareIcon, TrashIcon, EllipsisHorizontalIcon,
 } from '@heroicons/react/24/solid'
 
-type RowShape = { type?: string; status?: string }
+type RowShape = { type?: string; status?: string; terminal?: string }
 
 type TableProps<T extends RowShape> = {
   data: T[]
@@ -37,14 +21,60 @@ type TableProps<T extends RowShape> = {
   onDelete?: (row: T) => void
 }
 
+function Chip({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean
+  children: React.ReactNode
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={[
+        "inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm whitespace-nowrap",
+        "border transition",
+        active
+          ? "bg-blue-600 text-white border-blue-600"
+          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50",
+        "focus:outline-none focus:ring-2 focus:ring-blue-600/40",
+      ].join(" ")}
+    >
+      {children}
+    </button>
+  )
+}
+
 export function SortableTable<T extends RowShape>({
-  data,
-  columns,
-  onEdit,
-  onDelete,
+  data, columns, onEdit, onDelete,
 }: TableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState('')
+
+  const [selectedTerminals, setSelectedTerminals] = React.useState<Set<string>>(new Set())
+
+  const terminals = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          data.map(d => d.terminal).filter((t): t is string => Boolean(t))
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    [data]
+  )
+
+  const toggleTerminal = (t: string) => {
+    setSelectedTerminals(prev => {
+      const next = new Set(prev)
+      next.has(t) ? next.delete(t) : next.add(t)
+      return next
+    })
+  }
+  const clearTerminals = () => setSelectedTerminals(new Set())
 
   const norm = (s: unknown) =>
     String(s ?? '')
@@ -53,27 +83,26 @@ export function SortableTable<T extends RowShape>({
       .toLowerCase()
       .trim()
 
-  const globalFilterFn: FilterFn<T> = (
-    row: Row<T>,
-    _colId: string,
-    filterValue: unknown,
-  ) => {
-    const normalizedInfo = norm(filterValue)
-    if (!normalizedInfo) return true
+  const globalFilterFn: FilterFn<T> = (row: Row<T>, _colId, filterValue) => {
+    const q = norm(filterValue)
+    const rowType = norm(row.original.type)
+    const rowStatus = norm(row.original.status)
+    const rowTerminal = row.original.terminal ?? ''
 
-    const typeVal = norm(row.original.type)
-    const statusVal = norm(row.original.status)
+    const matchesQuery =
+      !q ||
+      rowType.startsWith(q) || rowType === q ||
+      rowStatus.startsWith(q) || rowStatus === q
 
-    const match = (v: string) =>
-      v.startsWith(normalizedInfo) || v === normalizedInfo
+    const matchesTerminals =
+      selectedTerminals.size === 0 || selectedTerminals.has(rowTerminal)
 
-    return match(typeVal) || match(statusVal)
+    return matchesQuery && matchesTerminals
   }
 
   const cols = React.useMemo<ColumnDef<T, unknown>[]>(() => {
     const base = [...columns]
     const hasActions = Boolean(onEdit) || Boolean(onDelete)
-
     if (hasActions) {
       const actionsCol: ColumnDef<T, unknown> = {
         id: '__actions',
@@ -84,70 +113,21 @@ export function SortableTable<T extends RowShape>({
             <div className="hidden gap-2 md:flex">
               {onEdit && (
                 <Button onClick={() => onEdit(row.original)} variant="ghost">
-                  <PencilSquareIcon
-                    className="text-green-500"
-                    aria-hidden
-                    width="1.5em"
-                  />
+                  <PencilSquareIcon className="text-green-500" aria-hidden width="1.5em" />
                 </Button>
               )}
               {onDelete && (
                 <Button onClick={() => onDelete(row.original)} variant="ghost">
-                  <TrashIcon
-                    aria-hidden
-                    className="text-red-500"
-                    width="1.5em"
-                  />
+                  <TrashIcon className="text-red-500" aria-hidden width="1.5em" />
                 </Button>
               )}
             </div>
-
             {(onEdit || onDelete) && (
               <div className="md:hidden">
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger asChild>
-                    <Button
-                      type="button"
-                      aria-label="Ações"
-                      variant="soft"
-                      color="blue"
-                      size="2"
-                      radius="large"
-                    >
-                      <EllipsisHorizontalIcon className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      sideOffset={6}
-                      collisionPadding={8}
-                      className="z-50 min-w-[160px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
-                    >
-                      {onEdit && (
-                        <DropdownMenu.Item
-                          onSelect={(e) => {
-                            e.preventDefault()
-                            onEdit(row.original)
-                          }}
-                          className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm outline-none select-none hover:bg-gray-50 dark:hover:bg-gray-800"
-                        >
-                          <PencilSquareIcon className="h-4 w-4" /> Editar
-                        </DropdownMenu.Item>
-                      )}
-                      {onDelete && (
-                        <DropdownMenu.Item
-                          onSelect={(e) => {
-                            e.preventDefault()
-                            onDelete(row.original)
-                          }}
-                          className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-600 outline-none select-none hover:bg-red-50 dark:hover:bg-red-900/20"
-                        >
-                          <TrashIcon className="h-4 w-4" /> Excluir
-                        </DropdownMenu.Item>
-                      )}
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+    
+                <Button type="button" aria-label="Ações" variant="soft" color="blue" size="2" radius="large">
+                  <EllipsisHorizontalIcon className="h-5 w-5" />
+                </Button>
               </div>
             )}
           </div>
@@ -155,7 +135,6 @@ export function SortableTable<T extends RowShape>({
       }
       base.push(actionsCol)
     }
-
     return base
   }, [columns, onEdit, onDelete])
 
@@ -173,20 +152,42 @@ export function SortableTable<T extends RowShape>({
 
   const minW = React.useMemo(
     () => `${table.getVisibleLeafColumns().length * 160}px`,
-    [table],
+    [table]
   )
+
+  const selectedCount = selectedTerminals.size
 
   return (
     <>
-      <Flex align="center" justify="between" className="mb-3 gap-2">
-        <TextField.Root
-          placeholder="Buscar por tipo ou status…"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full md:w-100"
-          size="2"
-        />
-      </Flex>
+
+      <div className="mb-3 space-y-2">
+
+        <div className="flex items-center gap-2 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Chip active={selectedCount === 0} onClick={clearTerminals}>
+            Todos
+          </Chip>
+          {terminals.map((t) => (
+            <Chip key={t} active={selectedTerminals.has(t)} onClick={() => toggleTerminal(t)}>
+              {t}
+            </Chip>
+          ))}
+        </div>
+
+        <Flex align="center" justify="between" className="gap-2">
+          <TextField.Root
+            placeholder="Buscar por tipo ou status…"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="w-full md:w-100"
+            size="2"
+          />
+          {selectedCount > 0 && (
+            <span className="hidden md:inline text-sm text-gray-600">
+              {selectedCount} selecionado{selectedCount > 1 ? 's' : ''}
+            </span>
+          )}
+        </Flex>
+      </div>
 
       <ScrollArea scrollbars="horizontal" type="auto">
         <Box style={{ minWidth: minW }}>
@@ -224,41 +225,19 @@ export function SortableTable<T extends RowShape>({
                             }}
                             className="inline-flex cursor-pointer items-center gap-1 select-none"
                           >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                            {sorted === 'asc' && (
-                              <ChevronUpIcon
-                                width="1em"
-                                className="text-white"
-                              />
-                            )}
-                            {sorted === 'desc' && (
-                              <ChevronDownIcon
-                                width="1em"
-                                className="text-white"
-                              />
-                            )}
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {sorted === 'asc' && <ChevronUpIcon width="1em" className="text-white" />}
+                            {sorted === 'desc' && <ChevronDownIcon width="1em" className="text-white" />}
                             {!sorted && (
                               <span className="flex">
-                                <ChevronUpIcon
-                                  width="1em"
-                                  className="text-grey -mb-0.5"
-                                />
-                                <ChevronDownIcon
-                                  width="1em"
-                                  className="text-grey -mt-0.5"
-                                />
+                                <ChevronUpIcon width="1em" className="text-grey -mb-0.5" />
+                                <ChevronDownIcon width="1em" className="text-grey -mt-0.5" />
                               </span>
                             )}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1">
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                            {flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
                         )}
                       </Table.ColumnHeaderCell>
@@ -273,23 +252,15 @@ export function SortableTable<T extends RowShape>({
                 <Table.Row key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <Table.Cell key={cell.id} className="max-w-24 truncate">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </Table.Cell>
                   ))}
                 </Table.Row>
               ))}
               {table.getRowModel().rows.length === 0 && (
                 <Table.Row>
-                  <Table.Cell
-                    colSpan={table.getVisibleLeafColumns().length}
-                    className="text-center"
-                  >
-                    <span className="block py-8 text-sm text-gray-500">
-                      Nada por aqui ainda.
-                    </span>
+                  <Table.Cell colSpan={table.getVisibleLeafColumns().length} className="text-center">
+                    <span className="block py-8 text-sm text-gray-500">Nada por aqui ainda.</span>
                   </Table.Cell>
                 </Table.Row>
               )}
