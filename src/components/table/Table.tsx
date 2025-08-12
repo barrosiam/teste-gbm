@@ -1,15 +1,25 @@
 import * as React from 'react'
-import { Table, ScrollArea, Box } from '@radix-ui/themes'
+import { Table, ScrollArea, Box, Button } from '@radix-ui/themes'
 import {
   useReactTable,
-  type ColumnDef, type CellContext, type Row, type FilterFn,
-  getCoreRowModel, getSortedRowModel, getFilteredRowModel,
-  type SortingState, flexRender,
+  type ColumnDef,
+  type CellContext,
+  type Row,
+  type FilterFn,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  type SortingState,
+  flexRender,
 } from '@tanstack/react-table'
 import {
-  ChevronUpIcon, ChevronDownIcon, PencilSquareIcon, TrashIcon, EllipsisHorizontalIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  EllipsisHorizontalIcon,
 } from '@heroicons/react/24/solid'
-
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 type RowShape = { type?: string; status?: string; terminal?: string }
 
 type TableProps<T extends RowShape> = {
@@ -17,10 +27,9 @@ type TableProps<T extends RowShape> = {
   columns: ColumnDef<T, unknown>[]
   onEdit?: (row: T) => void
   onDelete?: (row: T) => void
-  selectedTerminals?: Set<string> 
-  externalSearch?: string          
+  selectedTerminals?: Set<string>
+  externalSearch?: string
 }
-
 
 type GlobalFilterPayload = { q: string; terms: string[] }
 
@@ -46,16 +55,18 @@ export function SortableTable<T extends RowShape>({
       q: externalSearch ?? '',
       terms: selectedTerminals ? Array.from(selectedTerminals) : [],
     }),
-    [externalSearch, selectedTerminals]
+    [externalSearch, selectedTerminals],
   )
-
 
   const globalFilterFn: FilterFn<T> = (
     row: Row<T>,
     _colId,
-    filterValue: unknown
+    filterValue: unknown,
   ) => {
-    const { q, terms } = (filterValue as GlobalFilterPayload) ?? { q: '', terms: [] }
+    const { q, terms } = (filterValue as GlobalFilterPayload) ?? {
+      q: '',
+      terms: [],
+    }
 
     const nq = norm(q)
     const rowType = norm(row.original.type)
@@ -64,8 +75,10 @@ export function SortableTable<T extends RowShape>({
 
     const matchesQuery =
       !nq ||
-      rowType.startsWith(nq) || rowType === nq ||
-      rowStatus.startsWith(nq) || rowStatus === nq
+      rowType.startsWith(nq) ||
+      rowType === nq ||
+      rowStatus.startsWith(nq) ||
+      rowStatus === nq
 
     const matchesTerminals =
       terms.length === 0 ? true : terms.includes(rowTerminal)
@@ -104,17 +117,53 @@ export function SortableTable<T extends RowShape>({
                 </button>
               )}
             </div>
-  
+
             {(onEdit || onDelete) && (
               <div className="md:hidden">
-                <button
-                  type="button"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-black/5"
-                  aria-label="Ações"
-                  onClick={() => onEdit?.(row.original)}
-                >
-                  <EllipsisHorizontalIcon className="h-5 w-5" />
-                </button>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <Button
+                      type="button"
+                      aria-label="Ações"
+                      variant="soft"
+                      color="blue"
+                      size="2"
+                      radius="large"
+                    >
+                      <EllipsisHorizontalIcon className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      sideOffset={6}
+                      collisionPadding={8}
+                      className="z-50 min-w-[160px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                    >
+                      {onEdit && (
+                        <DropdownMenu.Item
+                          onSelect={(e) => {
+                            e.preventDefault()
+                            onEdit(row.original)
+                          }}
+                          className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm outline-none select-none hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                          <PencilSquareIcon className="h-4 w-4" /> Editar
+                        </DropdownMenu.Item>
+                      )}
+                      {onDelete && (
+                        <DropdownMenu.Item
+                          onSelect={(e) => {
+                            e.preventDefault()
+                            onDelete(row.original)
+                          }}
+                          className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-600 outline-none select-none hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <TrashIcon className="h-4 w-4" /> Excluir
+                        </DropdownMenu.Item>
+                      )}
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
               </div>
             )}
           </div>
@@ -129,7 +178,7 @@ export function SortableTable<T extends RowShape>({
   const table = useReactTable({
     data,
     columns: cols,
-    state: { sorting, globalFilter: globalFilterState }, 
+    state: { sorting, globalFilter: globalFilterState },
     onSortingChange: setSorting,
     onGlobalFilterChange: () => {},
     globalFilterFn,
@@ -140,7 +189,7 @@ export function SortableTable<T extends RowShape>({
 
   const minW = React.useMemo(
     () => `${table.getVisibleLeafColumns().length * 160}px`,
-    [table]
+    [table],
   )
 
   return (
@@ -180,19 +229,38 @@ export function SortableTable<T extends RowShape>({
                           }}
                           className="inline-flex cursor-pointer items-center gap-1 select-none"
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {sorted === 'asc' && <ChevronUpIcon width="1em" className="text-white" />}
-                          {sorted === 'desc' && <ChevronDownIcon width="1em" className="text-white" />}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {sorted === 'asc' && (
+                            <ChevronUpIcon width="1em" className="text-white" />
+                          )}
+                          {sorted === 'desc' && (
+                            <ChevronDownIcon
+                              width="1em"
+                              className="text-white"
+                            />
+                          )}
                           {!sorted && (
                             <span className="flex">
-                              <ChevronUpIcon width="1em" className="text-grey -mb-0.5" />
-                              <ChevronDownIcon width="1em" className="text-grey -mt-0.5" />
+                              <ChevronUpIcon
+                                width="1em"
+                                className="text-grey -mb-0.5"
+                              />
+                              <ChevronDownIcon
+                                width="1em"
+                                className="text-grey -mt-0.5"
+                              />
                             </span>
                           )}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1">
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                         </span>
                       )}
                     </Table.ColumnHeaderCell>
