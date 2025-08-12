@@ -87,7 +87,7 @@ src/
 
 ## 🚀 Deploy
 
-// add link do vercel já já
+[Deploy na Vercel](https://teste-gbm.vercel.app/).
 
 ---
 
