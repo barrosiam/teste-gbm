@@ -52,7 +52,7 @@
       "id": "0e539e",
       "name": "Operação XPTO",
       "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
-      "type": "Desmbarque",
+      "type": "Desembarque",
       "terminal": "Terminal Norte",
       "status": "Processando"
     },
@@ -68,7 +68,7 @@
       "id": "34325",
       "name": "Operação XPTO",
       "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
-      "type": "Desmbarque",
+      "type": "Desembarque",
       "terminal": "Terminal Leste",
       "status": "Finalizada"
     },
@@ -84,7 +84,7 @@
       "id": "34355",
       "name": "Operação XPTO",
       "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
-      "type": "Desmbarque",
+      "type": "Desembarque",
       "terminal": "Terminal Leste",
       "status": "Finalizada"
     },
