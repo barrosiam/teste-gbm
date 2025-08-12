@@ -1,8 +1,7 @@
 import axios from 'axios'
-const API = '/api'
 
 export const api = axios.create({
-  baseURL: API,
+  baseURL: 'https://json-server-teste-gbm-ybm1.vercel.app/',
   headers: {
     'Content-Type': 'application/json',
   },
