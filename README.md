@@ -1,69 +1,102 @@
-# React + TypeScript + Vite
+# 🚢 Teste GBM — Controle de Operações Portuárias
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação desenvolvida como teste técnico para **Controle de Operações Portuárias**, utilizando **React + TypeScript** e integração com uma API simulada via **JSON Server**.
 
-Currently, two official plugins are available:
+O objetivo é demonstrar domínio de **custom hooks**, **gerenciamento de estado global** (Context API ou Zustand), **componentização acessível** com Radix UI, uso de **TailwindCSS** para estilização responsiva e uma **boa arquitetura de projeto**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## ✨ Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Listar operações** a partir de uma biblioteca que simula uma API externa.
+2. **Adicionar nova operação** com:
+   - Descrição da carga.
+   - Tipo (Embarque ou Descarga).
+   - Terminal (ex.: "Terminal Norte", "Terminal Sul", etc.).
+3. **Editar e excluir operações** com persistência na API.
+4. **Marcar operações como finalizadas** (status).
+5. **Listar operações por terminal**.
+6. **Filtrar operações** por tipo e status.
+7. **Exibir feedbacks visuais** com Radix UI Toasts.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🛠️ Stack utilizada
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React** + **Vite** (Front-end SPA)
+- **TypeScript** (tipagem estática e segurança no desenvolvimento)
+- **TailwindCSS** (estilização rápida e responsiva)
+- **Radix UI** (componentes acessíveis e customizáveis)
+- **JSON Server** (simulação de API externa para persistência de dados)
+
+---
+
+## 📦 Pré-requisitos
+
+- **Node.js** v18+
+- **npm** ou **yarn** instalados
+
+---
+
+## ⚙️ Instalação e uso
+
+1. **Clone o repositório**
+
+   ```bash
+   git clone https://github.com/seuusuario/teste-gbm.git
+   cd teste-gbm
+   ```
+
+2. **Instale as dependências**
+
+   ```bash
+   npm install
+   # ou
+   yarn install
+   ```
+
+3. **Inicie o JSON Server** (API simulada)
+
+   ```bash
+   npm run server
+   # API disponível em http://localhost:3001
+   ```
+
+4. **Inicie o front-end**
+   ```bash
+   npm run dev
+   # Aplicação disponível em http://localhost:5173
+   ```
+
+---
+
+## 📂 Estrutura do projeto
+
+```
+src/
+ ├── components/     # Componentes reutilizáveis
+ ├── hooks/          # Custom hooks
+ ├── pages/          # Páginas da aplicação
+ ├── services/       # Integração com API
+ ├── types/          # Tipagens TypeScript
+ ├── App.tsx         # Roteamento e layout
+ └── main.tsx        # Ponto de entrada
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Deploy
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+// add link do vercel já já
+
+---
+
+## 📄 Licença
+
+Este projeto é de uso interno para avaliação técnica e não possui licença pública.
+
+---
+
+## 👨‍💻 Autor
+
+Desenvolvido por [Samanta Barros](https://www.linkedin.com/in/samanta-barros/).
