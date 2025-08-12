@@ -13,7 +13,7 @@ import {
   type OpType,
   type OpTerminal,
 } from '../inputs/select/selectOptions'
-import { useBreakpointValue } from '../../hooks/useMediaQuery'
+import { useBreakpointValue } from '../../hooks/breakpoint'
 import { Button } from '../inputs/button'
 
 type EditProps = {
@@ -69,10 +69,14 @@ export function OperationModal(props: Props) {
     [props],
   )
 
-  const modalWidth = useBreakpointValue({
-    base: 'w-[min(96vw,520px)]',
-    md: 'w-[min(92vw,560px)]',
-  })
+
+  const modalWidth = useBreakpointValue(
+    {
+      base: 'w-[min(96vw,520px)]',
+      md: 'w-[min(92vw,560px)]',
+    }
+
+  )
 
   const {
     register,
@@ -157,15 +161,18 @@ export function OperationModal(props: Props) {
                   size="3"
                   radius="large"
                   id={nameId}
-                  type="text"
-                  autoComplete="name"
-                  className="w-full rounded-lg bg-transparent outline-none"
-                  placeholder="Digite o nome"
-                  aria-invalid={!!errors.name}
-                  aria-describedby={errors.name ? nameErrId : undefined}
-                  {...register('name', { required: 'Nome é obrigatório.' })}
-                  disabled={saving}
-                ></TextField.Root>
+                  className="w-full"
+                   type="text"
+                    autoComplete="name"                  
+                    placeholder="Digite o nome"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? nameErrId : undefined}
+                    disabled={saving}
+                    {...register('name', { required: 'Nome é obrigatório.' })}
+                >
+               
+              
+                </TextField.Root>
                 {errors.name && (
                   <Text id={nameErrId} color="red" size="2">
                     {errors.name.message}
@@ -301,12 +308,13 @@ export function OperationModal(props: Props) {
               />
             </Flex>
           </form>
+
           <Dialog.Close asChild>
             <button
               type="button"
               aria-label="Fechar"
               disabled={saving}
-              className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 disabled:opacity-50"
+              className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 disabled:opacity-50"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
