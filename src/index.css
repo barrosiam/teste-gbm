@@ -72,7 +72,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: 1rem;
+  margin: 0 auto;
 }
 
 a {
@@ -84,6 +84,12 @@ a {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+.rt-SelectTrigger {
+  border-radius: 0.25rem !important;
+  padding-right: 2px;
+  padding-left: 2px;
+  overflow: hidden;
 }
 
 @media (prefers-color-scheme: light) {

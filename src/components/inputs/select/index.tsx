@@ -18,18 +18,23 @@ export function ModalSelect<V extends string>({
   disabled,
 }: Props<V>) {
   return (
-    <Select.Root
+
+   <Select.Root
       value={value || undefined}
       onValueChange={(v) => onChange(v as V)}
       disabled={disabled}
-      size="2"
+      size="3"
     >
-      <Select.Trigger
-        radius="large"
-        variant="classic"
+      <Select.Trigger 
+       className={[
+          '[&.rt-SelectTrigger]:border',
+          '[&.rt-SelectTrigger]:border-gray-300',
+          'focus:ring-2 focus:ring-indigo-500',
+          'w-full'
+        ].join(' ')}
         placeholder={placeholder}
       />
-      <Select.Content color="indigo" variant="soft" position="popper">
+      <Select.Content  color="indigo" variant="soft" position="popper">
         {options.map((opt) => (
           <Select.Item key={opt.value} value={opt.value}>
             {opt.label}
@@ -37,5 +42,6 @@ export function ModalSelect<V extends string>({
         ))}
       </Select.Content>
     </Select.Root>
+
   )
 }

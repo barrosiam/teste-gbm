@@ -72,7 +72,7 @@ export function OperationModal(props: Props) {
 
   const modalWidth = useBreakpointValue(
     {
-      base: 'w-[min(96vw,520px)]',
+      base: 'w-[min(90vw,400px)]',
       md: 'w-[min(92vw,560px)]',
     }
 
