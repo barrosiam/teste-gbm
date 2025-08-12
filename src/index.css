@@ -1,12 +1,66 @@
-@import "@radix-ui/themes/styles.css";
-@import "tailwindcss";
-
+@import '@radix-ui/themes/styles.css';
+@import 'tailwindcss';
 
 @tailwind components;
 @tailwind utilities;
 
+@keyframes toast-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes toast-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+@keyframes toast-swipe-out-x {
+  from {
+    transform: translateX(var(--radix-toast-swipe-end-x));
+  }
+  to {
+    transform: translateX(calc(100% + 16px));
+  }
+}
+@keyframes toast-swipe-out-y {
+  from {
+    transform: translateY(var(--radix-toast-swipe-end-y));
+  }
+  to {
+    transform: translateY(calc(100% + 16px));
+  }
+}
+
+.animate-toastIn {
+  animation: toast-in 150ms ease-out;
+}
+.animate-toastOut {
+  animation: toast-out 150ms ease-in forwards;
+}
+.animate-toastSwipeOutX {
+  animation: toast-swipe-out-x 150ms ease-out forwards;
+}
+.animate-toastSwipeOutY {
+  animation: toast-swipe-out-y 150ms ease-out forwards;
+}
+
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto;
   line-height: 1.5;
   font-weight: 400;
 
@@ -37,8 +91,8 @@ h1 {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
-
 }
