@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { OperationsService } from '../services/operation.service'
 import type { Operation } from '../types/operations/operation'
 import { SortableTable } from '../components/table/Table'
@@ -7,20 +7,40 @@ import { OperationModal } from '../components/modals/OperationModal'
 import { Flex, Spinner } from '@radix-ui/themes'
 import { useToast } from '../hooks/useToast'
 import { Button } from '../components/inputs/button'
+import { FiltersBar } from '../components/filters/FilterBar'
 
 export default function Operation() {
   const { toastSuccess, toastError } = useToast()
 
   const [operations, setOperations] = useState<Operation[]>([])
   const [loading, setLoading] = useState(true)
-  const [errorMsg, setError] = useState<string | null>(null) // check
+  const [errorMsg, setError] = useState<string | null>(null)
 
-  const [openCreate, setOpenCreate] = useState(false)
-  const [savingCreate, setSavingCreate] = useState(false)
+  const [selectedTerminals, setSelectedTerminals] = useState<Set<string>>(
+    new Set(),
+  )
+  const [search, setSearch] = useState('')
 
-  const [openEdit, setOpenEdit] = useState(false)
-  const [editing, setEditing] = useState<Operation | null>(null)
-  const [savingEdit, setSavingEdit] = useState(false)
+  const terminals = useMemo(
+    () =>
+      Array.from(
+        new Set(operations.map((o) => o.terminal).filter(Boolean)),
+      ).sort((a, b) => a.localeCompare(b)),
+    [operations],
+  )
+
+  const toggleTerminal = (t: string) => {
+    setSelectedTerminals((prev) => {
+      const next = new Set(prev)
+      if (next.has(t)) {
+        next.delete(t)
+      } else {
+        next.add(t)
+      }
+      return next
+    })
+  }
+  const clearTerminals = () => setSelectedTerminals(new Set())
 
   useEffect(() => {
     let alive = true
@@ -77,7 +97,6 @@ export default function Operation() {
   const handleDelete = async (operation: Operation) => {
     try {
       await OperationsService.delete(operation.id)
-
       setOperations((prev) => prev.filter((op) => op.id !== operation.id))
       toastSuccess('Operação removida', `${operation.name} deletada.`)
     } catch (err) {
@@ -85,6 +104,13 @@ export default function Operation() {
       toastError('Erro ao deletar', 'Não foi possível remover a operação.')
     }
   }
+
+  const [openCreate, setOpenCreate] = useState(false)
+  const [savingCreate, setSavingCreate] = useState(false)
+
+  const [openEdit, setOpenEdit] = useState(false)
+  const [editing, setEditing] = useState<Operation | null>(null)
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const handleEdit = (row: Operation) => {
     setEditing(row)
@@ -100,7 +126,6 @@ export default function Operation() {
       )
       setOpenEdit(false)
       setEditing(null)
-
       toastSuccess('Operação atualizada', `${saved.name} salva com sucesso.`)
     } catch (err) {
       console.error(err)
@@ -112,11 +137,23 @@ export default function Operation() {
 
   return (
     <div className="w-full">
-      <Flex justify="between" align="center" className="mb-4">
-        <h1 className="text-xl font-bold">Operações</h1>
-        <Button
+      <Flex  justify="center" className="mb-4 mt-4">
+    <h1 className="text-md font-bold text-center">Lista de Operações do Porto XPTO</h1>
+      </Flex>
+  
+      <Flex justify="between" align="center" className="mb-4 flex-col gap-4 md:flex-row md:items-center md:gap-0">
+        <FiltersBar
+          terminals={terminals}
+          selectedTerminals={selectedTerminals}
+          onToggleTerminal={toggleTerminal}
+          onClearTerminals={clearTerminals}
+          search={search}
+          onSearchChange={setSearch}
+        />
+          <Button
           color="[#1154ff]"
           label="Nova operação"
+          classInfo='w-full md:w-auto h-12 text-base'
           onClick={() => setOpenCreate(true)}
           disabled={loading || savingCreate}
         />
@@ -144,8 +181,11 @@ export default function Operation() {
           columns={operationColumns}
           onDelete={handleDelete}
           onEdit={handleEdit}
+          selectedTerminals={selectedTerminals}
+          externalSearch={search}
         />
       )}
+
       <OperationModal
         mode="create"
         open={openCreate}
@@ -158,6 +198,7 @@ export default function Operation() {
           terminal: 'Terminal Sul',
         }}
       />
+
       {editing && (
         <OperationModal
           mode="edit"
