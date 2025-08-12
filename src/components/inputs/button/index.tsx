@@ -16,7 +16,7 @@ export const Button = ({
   classInfo,
 }: Props) => {
   return (
-    <div className={`${classInfo}`} >
+    <div className={`${classInfo}`}>
       <button
         className={`rounded-md ${classInfo} transition-colors bg-${color} rounded p-3 font-medium text-white hover:bg-${color} disabled:opacity-50`}
         onClick={onClick}

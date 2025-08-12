@@ -69,14 +69,10 @@ export function OperationModal(props: Props) {
     [props],
   )
 
-
-  const modalWidth = useBreakpointValue(
-    {
-      base: 'w-[min(90vw,400px)]',
-      md: 'w-[min(92vw,560px)]',
-    }
-
-  )
+  const modalWidth = useBreakpointValue({
+    base: 'w-[min(90vw,400px)]',
+    md: 'w-[min(92vw,560px)]',
+  })
 
   const {
     register,
@@ -162,17 +158,14 @@ export function OperationModal(props: Props) {
                   radius="large"
                   id={nameId}
                   className="w-full"
-                   type="text"
-                    autoComplete="name"                  
-                    placeholder="Digite o nome"
-                    aria-invalid={!!errors.name}
-                    aria-describedby={errors.name ? nameErrId : undefined}
-                    disabled={saving}
-                    {...register('name', { required: 'Nome é obrigatório.' })}
-                >
-               
-              
-                </TextField.Root>
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Digite o nome"
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? nameErrId : undefined}
+                  disabled={saving}
+                  {...register('name', { required: 'Nome é obrigatório.' })}
+                ></TextField.Root>
                 {errors.name && (
                   <Text id={nameErrId} color="red" size="2">
                     {errors.name.message}
@@ -314,7 +307,7 @@ export function OperationModal(props: Props) {
               type="button"
               aria-label="Fechar"
               disabled={saving}
-              className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 disabled:opacity-50"
+              className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 disabled:opacity-50"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>

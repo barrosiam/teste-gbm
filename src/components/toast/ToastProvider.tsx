@@ -49,25 +49,32 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<ToastMsg[]>([])
 
   const remove = React.useCallback((id: string) => {
-    setItems(prev => prev.filter(t => t.id !== id))
+    setItems((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
   const show = React.useCallback((m: Omit<ToastMsg, 'id'>) => {
-    const id = (globalThis.crypto as Crypto | undefined)?.randomUUID?.() ?? String(Date.now() + Math.random())
-    setItems(prev => [...prev, { id, duration: 3000, color: 'green', ...m }])
+    const id =
+      (globalThis.crypto as Crypto | undefined)?.randomUUID?.() ??
+      String(Date.now() + Math.random())
+    setItems((prev) => [...prev, { id, duration: 3000, color: 'green', ...m }])
   }, [])
 
   const toastSuccess = React.useCallback(
-    (title: string, description?: string) => show({ title, description, color: 'green' }),
-    [show]
+    (title: string, description?: string) =>
+      show({ title, description, color: 'green' }),
+    [show],
   )
 
   const toastError = React.useCallback(
-    (title: string, description?: string) => show({ title, description, color: 'red' }),
-    [show]
+    (title: string, description?: string) =>
+      show({ title, description, color: 'red' }),
+    [show],
   )
 
-  const value = React.useMemo(() => ({ show, toastSuccess, toastError }), [show, toastSuccess, toastError])
+  const value = React.useMemo(
+    () => ({ show, toastSuccess, toastError }),
+    [show, toastSuccess, toastError],
+  )
 
   const viewportClass = React.useMemo(
     () =>
@@ -82,7 +89,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             'left-0 right-0 px-4',
             'bottom-[max(theme(spacing.4),env(safe-area-inset-bottom))]',
           ].join(' '),
-    [isSmUp]
+    [isSmUp],
   )
 
   return (
@@ -90,14 +97,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <Toast.Provider swipeDirection={swipeDir}>
         {children}
 
-        {items.map(t => {
+        {items.map((t) => {
           const c = colorClasses(t.color)
           return (
             <Toast.Root
               key={t.id}
               duration={t.duration}
               defaultOpen
-              onOpenChange={open => !open && remove(t.id)}
+              onOpenChange={(open) => !open && remove(t.id)}
               className={[
                 'w-full max-w-full',
                 'group flex items-start justify-between gap-3 rounded-lg border px-4 py-3 shadow-lg',
@@ -112,11 +119,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <div className="flex min-w-0 items-start gap-3">
                 <div className="mt-0.5 shrink-0">{c.icon}</div>
                 <div className="min-w-0">
-                  <Toast.Title className={`font-medium leading-5 ${c.title} break-words`}>
+                  <Toast.Title
+                    className={`leading-5 font-medium ${c.title} break-words`}
+                  >
                     {t.title}
                   </Toast.Title>
                   {t.description && (
-                    <Toast.Description className={`mt-1 text-sm leading-5 ${c.desc} break-words`}>
+                    <Toast.Description
+                      className={`mt-1 text-sm leading-5 ${c.desc} break-words`}
+                    >
                       {t.description}
                     </Toast.Description>
                   )}
@@ -125,7 +136,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
               <Toast.Close
                 aria-label="Fechar"
-                className="self-start rounded opacity-60 transition hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-black/20"
+                className="self-start rounded opacity-60 transition hover:opacity-100 focus:ring-2 focus:ring-black/20 focus:outline-none"
               >
                 <XMarkIcon className="h-4 w-4" />
               </Toast.Close>

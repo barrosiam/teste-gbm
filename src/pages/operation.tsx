@@ -137,11 +137,17 @@ export default function Operation() {
 
   return (
     <div className="w-full p-6 lg:p-[1rem]">
-      <Flex  justify="center" className="mb-4 mt-4">
-    <h1 className="text-md font-bold text-center">Lista de Operações do Porto XPTO</h1>
+      <Flex justify="center" className="mt-4 mb-4">
+        <h1 className="text-md text-center font-bold">
+          Lista de Operações do Porto XPTO
+        </h1>
       </Flex>
-  
-      <Flex justify="between" align="center" className="mb-4 flex-col gap-4 md:flex-row md:items-center md:gap-0">
+
+      <Flex
+        justify="between"
+        align="center"
+        className="mb-4 flex-col gap-4 md:flex-row md:items-center md:gap-0"
+      >
         <FiltersBar
           terminals={terminals}
           selectedTerminals={selectedTerminals}
@@ -150,10 +156,10 @@ export default function Operation() {
           search={search}
           onSearchChange={setSearch}
         />
-          <Button
+        <Button
           color="[#1154ff]"
           label="Nova operação"
-          classInfo='w-full md:w-auto h-12 text-base'
+          classInfo="w-full md:w-auto h-12 text-base"
           onClick={() => setOpenCreate(true)}
           disabled={loading || savingCreate}
         />
