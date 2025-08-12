@@ -136,7 +136,7 @@ export default function Operation() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full p-6 lg:p-[1rem]">
       <Flex  justify="center" className="mb-4 mt-4">
     <h1 className="text-md font-bold text-center">Lista de Operações do Porto XPTO</h1>
       </Flex>
